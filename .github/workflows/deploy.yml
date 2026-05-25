@@ -1,4 +1,4 @@
-name: Deploy ShopOS Backend
+name: Deploy ShopOS
 
 on:
   push:
@@ -18,8 +18,10 @@ jobs:
           username: ${{ secrets.VPS_SSH_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd ~/duka/backend
+            cd ~/duka
             git pull origin main
-            echo "${{ secrets.PRODUCTION_ENV }}" > .env
-            chmod +x scripts/deploy.sh
-            ./scripts/deploy.sh
+            echo "${{ secrets.PRODUCTION_ENV }}" > backend/.env
+            docker compose down
+            docker compose build
+            docker compose up -d
+            docker system prune -f

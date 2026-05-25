@@ -2,7 +2,8 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from apps.shops.models import Shop, Branch
-from .serializers import OwnerSerializer, RegisterSerializer, ShopkeeperSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import OwnerSerializer, RegisterSerializer, ShopkeeperSerializer, MyTokenObtainPairSerializer
 from .models import Shopkeeper
 
 User = get_user_model()
@@ -53,3 +54,6 @@ class ShopkeeperViewSet(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
