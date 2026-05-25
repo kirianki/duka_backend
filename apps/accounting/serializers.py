@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import JournalEntry, ExpenseCategory, Expense
+from .models import JournalEntry, ExpenseCategory, Expense, FinancialAccount
 
 class JournalEntrySerializer(serializers.ModelSerializer):
     class Meta:
@@ -18,7 +18,13 @@ class ExpenseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Expense
         fields = (
-            'id', 'shop', 'branch', 'category', 'category_name',
+            'id', 'shop', 'branch', 'category', 'category_name', 'account',
             'description', 'amount', 'date', 'created_at', 'local_id'
         )
         read_only_fields = ('id', 'shop', 'created_at')
+
+class FinancialAccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FinancialAccount
+        fields = ('id', 'name', 'account_type', 'balance', 'is_default')
+        read_only_fields = ('balance',)

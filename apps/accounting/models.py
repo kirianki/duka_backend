@@ -18,10 +18,27 @@ class JournalEntry(models.Model):
     def __str__(self):
         return self.entry_ref
 
+class FinancialAccount(models.Model):
+    ACCOUNT_TYPES = (
+        ('CASH', 'Cash'),
+        ('MPESA', 'M-Pesa Float'),
+        ('BANK', 'Bank'),
+        ('OTHER', 'Other'),
+    )
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, related_name='financial_accounts')
+    name = models.CharField(max_length=100)
+    account_type = models.CharField(max_length=20, choices=ACCOUNT_TYPES)
+    balance = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    is_default = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} ({self.balance})"
+
 class JournalLine(models.Model):
     entry = models.ForeignKey(JournalEntry, on_delete=models.CASCADE, related_name='lines')
-    account_code = models.CharField(max_length=10)
-    account_name = models.CharField(max_length=100)
+    account = models.ForeignKey(FinancialAccount, on_delete=models.SET_NULL, null=True, related_name='journal_lines')
+    account_name = models.CharField(max_length=100) # Fallback / descriptive
     debit = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     credit = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
@@ -42,6 +59,7 @@ class Expense(models.Model):
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE, related_name='expenses')
     branch = models.ForeignKey(Branch, on_delete=models.SET_NULL, null=True, related_name='expenses')
     category = models.ForeignKey(ExpenseCategory, on_delete=models.SET_NULL, null=True, related_name='expenses')
+    account = models.ForeignKey(FinancialAccount, on_delete=models.SET_NULL, null=True, related_name='expenses')
     description = models.TextField()
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateField()
