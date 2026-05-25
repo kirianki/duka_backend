@@ -27,3 +27,26 @@ class JournalLine(models.Model):
 
     def __str__(self):
         return f"{self.account_name} ({'DR' if self.debit > 0 else 'CR'})"
+
+class ExpenseCategory(models.Model):
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, related_name='expense_categories')
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name_plural = "Expense Categories"
+
+    def __str__(self):
+        return f"{self.shop.name} - {self.name}"
+
+class Expense(models.Model):
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, related_name='expenses')
+    branch = models.ForeignKey(Branch, on_delete=models.SET_NULL, null=True, related_name='expenses')
+    category = models.ForeignKey(ExpenseCategory, on_delete=models.SET_NULL, null=True, related_name='expenses')
+    description = models.TextField()
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    date = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    local_id = models.CharField(max_length=64, db_index=True)
+
+    def __str__(self):
+        return f"{self.description} ({self.amount})"
